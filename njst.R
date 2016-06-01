@@ -48,5 +48,4 @@ rownames(matrixtest)<-names(varList)
 #TODO: find a way to find pairs of variables
 #3 cases
 
-
-
+https://stackoverflow.com/questions/28056727/obtain-key-from-value-in-r
