@@ -2,19 +2,24 @@
 #test<-"(((AID,BED),CAB),(DAD,EGG))"
 #test<-"((ANC:.1,BED:.2):.15,(CAS:.1,DED:.05):.2)"
 test<-"((ABE,BOG),((COD,DON),EGO))"
+uniquevarID<-0
 
 #phase out unecessary data in the newick notation
 simplified<-gsub("[:.0-9]","",test)
 myVars<-strsplit((gsub("[()]","",simplified)),"[,]")[[1]]
 
 #initalizing list to store variables
-varList <- list()
-for (var in myVars)
+#TODO: Preallocate size of list
+matrixList <- vector(mode="list",length=length(myVars))
+count<-1
+for (vars in myVars)
 {
-  varList[[ var ]] <- 0
+  matrixList[[count]]<- list(var=vars, value=0, varMatrix=matrix(0,nrow=length(myVars),ncol=1))
+  rownames(matrixList[[count]]$varMatrix)<-myVars
+  count<-count+1
 }
 
-#splits the matrix into variables
+#splits the newick notation into variables
 full_split<-gsub("[A-Z]"," ",simplified)
 full_split<-gsub("(?<=[\\s])\\s*|^\\s+|\\s+$", "", full_split, perl=TRUE)
 full_split <- strsplit(full_split, "")[[1]]
@@ -35,13 +40,13 @@ for(i in full_split)
   }
   if(i==" ")
   {
-    varList[[count]]<-priority
+    matrixList[[count]]$value<-priority
     count<-count+1
   }
 }
 
 #creates matrix 
-finalMatrix <- matrix(0,nrow=length(varList),ncol=length(varList))
+finalMatrix <- matrix(0,nrow=length(myVars),ncol=length(myVars))
 #names(varList) might be able to be subsitute by myVars 
 colnames(finalMatrix)<-myVars
 rownames(finalMatrix)<-myVars
@@ -54,15 +59,6 @@ rownames(finalMatrix)<-myVars
 # 2 variables with filled matrix
 
 
-#generation of matrixList
-#possible to fuse in previous for loop?
-matrixList<-list()
-for(i in 1:length(varList))
-{
-  matrixList[[i]]<- list(var=names(varList[i]), value=varList[[i]], varMatrix=matrix(0,nrow=length(varList),ncol=1))
-  rownames(matrixList[[i]]$varMatrix)<-myVars
-}
-
 #finding highest priority and amount
 varVal <- sapply(matrixList,"[[","value")
 maxPriority<-varVal[which.max(abs(varVal))]
@@ -74,10 +70,20 @@ count<-0
 
 #find appropriate indexes to modify
 #TODO: maybe add a conditional statement to make sure numbers are even
+#list preallocated to be more efficient
+indexList<-vector("list",100)
 for(i in 1:sum(varVal==maxPriority))
 {
-  print(match(nameStore[i],myVars))
+  indexList[[count+1]]<-match(nameStore[i],myVars)
+  count<-count+1
 }
 
-
+#handles two variables at a time
+#conditional may need to be added for odd ones
+#three cases in here
+for(i in seq.int(1,count,2)) { 
+  
+} 
+matrixList[[3]]<-NULL
+#sum(matrixList[[3]]$varMatrix)
 
