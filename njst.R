@@ -188,14 +188,11 @@ while(length(matrixList)>2)
         {
           for(jj in myVars)
           {
-            secondValue<-matrixList[[indexList[[i+1]]]]$varMatrix[[ii, 1]]
-            if(secondValue>0)
+            secondValue<-matrixList[[indexList[[i+1]]]]$varMatrix[[jj, 1]]
+            if(secondValue>0 && ii!=jj)
             {
-              if(ii!=jj)
-              {
               finalMatrix[jj,ii]<-value+secondValue+2
               finalMatrix[ii,jj]<-value+secondValue+2
-              }
             }
           }
         }
@@ -207,10 +204,10 @@ while(length(matrixList)>2)
       
       for(k in myVars)
       {
-        value<-matrixList[[indexList[[i]]]]$varMatrix[[i, 1]]
+        value<-matrixList[[indexList[[i]]]]$varMatrix[[k, 1]]
         if(value>0)
         {
-          finalMatrix[[k,1]]<-finalMatrix[[k,1]]+1
+          matrixList[[indexList[[i]]]]$varMatrix[[k,1]]<- matrixList[[indexList[[i]]]]$varMatrix[[k,1]]+1
         }
       }
     }
