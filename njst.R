@@ -5,7 +5,8 @@
 #test<-"((A,B),C)"
 #test<-"((A,B),(C,D))"
 #test<-"((ABE,BOG),((COD,DON),EGO))"
-test<-"((A,B),((C,D),E))"
+#test<-"((A,B),((C,D),E))"
+test<-"(((A,B),(C,D)),(E,F))"
 uniquevarID<-0
 tempVar<-"tempVar"
 
@@ -179,19 +180,22 @@ while(length(matrixList)>2)
     if(matrixCount==2)
     {
       #fill in matrix values
-      for(i in myVars)
+      for(ii in myVars)
       {
         
-        value<-matrixList[[indexList[[i]]]]$varMatrix[[i, 1]]
+        value<-matrixList[[indexList[[i]]]]$varMatrix[[ii, 1]]
         if(value>0)
         {
-          for(j in myVars)
+          for(jj in myVars)
           {
-            secondValue<-matrixList[[indexList[[i+1]]]]$varMatrix[[i, 1]]
+            secondValue<-matrixList[[indexList[[i+1]]]]$varMatrix[[ii, 1]]
             if(secondValue>0)
             {
-              finalMatrix[j,i]<-value+secondValue+2
-              finalMatrix[i,j]<-value+secondValue+2
+              if(ii!=jj)
+              {
+              finalMatrix[jj,ii]<-value+secondValue+2
+              finalMatrix[ii,jj]<-value+secondValue+2
+              }
             }
           }
         }
@@ -199,9 +203,8 @@ while(length(matrixList)>2)
       
       #developing a new temp variable
       matrixList[[indexList[[i]]]]$value<-matrixList[[indexList[[i]]]]$value-1
-      matrixList[[indexList[[i]]]]$varMatrix=matrixList[[indexList[[matrixVar]]]]$varMatrix
-      
       matrixList[[indexList[[i]]]]$varMatrix<-matrixList[[indexList[[i]]]]$varMatrix+matrixList[[indexList[[i+1]]]]$varMatrix
+      
       for(k in myVars)
       {
         value<-matrixList[[indexList[[i]]]]$varMatrix[[i, 1]]
@@ -276,7 +279,7 @@ if(matrixCount==2)
       for(j in myVars)
       {
         secondValue<-matrixList[[2]]$varMatrix[[j,1]]
-        if(secondValue>0)
+        if(secondValue>0 && i!=j)
         {
           finalMatrix[j,i]<-value+secondValue+1
           finalMatrix[i,j]<-value+secondValue+1
