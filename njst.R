@@ -1,17 +1,45 @@
 #3 test cases
 #test<-"(((AID,BED),CAB),(DAD,EGG))"
-#test<-"((ANC:.1,BED:.2):.15,(CAS:.1,DED:.05):.2)"
+test<-"((AN3C:.1,1BED:.2):.15,(CAS2:.1,DE4D:.05):.2)"
 #test<-"(A,B)"
 #test<-"((A,B),C)"
 #test<-"((A,B),(C,D))"
 #test<-"((ABE,BOG),((COD,DON),EGO))"
 #test<-"((A,B),((C,D),E))"
-test<-"(((A,B),(C,D)),(E,F))"
+#test<-"(((A,B),(C,D)),(E,F))"
 uniquevarID<-0
 tempVar<-"tempVar"
 
 #phase out unecessary data in the newick notation
-simplified<-gsub("[:.0-9]","",test)
+test_split<- strsplit(test,"")[[1]]
+
+count<-1
+numCheck<-FALSE
+for (char in test_split)
+{
+  
+  if(char==":")
+  {
+    numCheck<-TRUE
+  }
+  
+  if(char==","||char==")"||char=="(")
+  {
+    numCheck<-FALSE  
+  }
+  
+  if(numCheck==TRUE)
+  {
+    test_split <- test_split[-count]
+  }
+  else
+  {
+    count<-count+1 
+  }
+}
+
+simplified<-paste(test_split, collapse="")
+
 myVars<-strsplit((gsub("[()]","",simplified)),"[,]")[[1]]
 
 #initalizing list to store variables
@@ -26,7 +54,7 @@ for (vars in myVars)
 }
 
 #splits the newick notation into variables
-full_split<-gsub("[A-Z]"," ",simplified)
+full_split<-gsub("[A-Z0-9]"," ",simplified)
 full_split<-gsub("(?<=[\\s])\\s*|^\\s+|\\s+$", "", full_split, perl=TRUE)
 full_split <- strsplit(full_split, "")[[1]]
 
@@ -75,6 +103,12 @@ while(length(matrixList)>2)
   #ordering names in order
   nameStore<-myVars[order(varVal, decreasing=TRUE)]
   count<-0
+  
+  #conditional statement for 3 remainin variables with each being the same priority
+  if(length(matrixList)==3&&maxPriority==3)
+  {
+    break
+  }
   
   #find appropriate indexes to modify
   #TODO: maybe add a conditional statement to make sure numbers are even
@@ -222,69 +256,107 @@ while(length(matrixList)>2)
 }  
 
 #Last 2 variables
-matrixCount<-0
-#check first value
-if(sum(matrixList[[1]]$varMatrix)>0)
-{
-  matrixCount<-matrixCount+1
-  matrixVar<-1
-  onlyVar<-matrixList[[2]]$var
-}
 
-#check second value
-if(sum(matrixList[[2]]$varMatrix)>0)
+if(length(matrixList)==2)
 {
-  matrixCount<-matrixCount+1
-  matrixVar<-2
-  onlyVar<-matrixList[[1]]$var
-}
-
-firstVar<-matrixList[[1]]$var
-secondVar<-matrixList[[2]]$var
-
-#final case for 2 variable
-if(matrixCount==0)
-{
-  finalMatrix[firstVar,secondVar]<-1
-  finalMatrix[secondVar,firstVar]<-1
-}
-
-#final case for 1 variable and 1 matrix
-if(matrixCount==1)
-{
-  for(i in myVars)
+  matrixCount<-0
+  #check first value
+  if(sum(matrixList[[1]]$varMatrix)>0)
   {
-    
-    value<-matrixList[[matrixVar]]$varMatrix[[i, 1]]
-    if(value>0)
+    matrixCount<-matrixCount+1
+    onlyVar<-matrixList[[2]]$var
+  }
+  
+  #check second value
+  if(sum(matrixList[[2]]$varMatrix)>0)
+  {
+    matrixCount<-matrixCount+1
+    onlyVar<-matrixList[[1]]$var
+  }
+  
+  firstVar<-matrixList[[1]]$var
+  secondVar<-matrixList[[2]]$var
+  
+  #final case for 2 variable
+  if(matrixCount==0)
+  {
+    finalMatrix[firstVar,secondVar]<-1
+    finalMatrix[secondVar,firstVar]<-1
+  }
+  
+  #final case for 1 variable and 1 matrix
+  if(matrixCount==1)
+  {
+    for(i in myVars)
     {
-      finalMatrix[onlyVar,i]<-value+1
-      finalMatrix[i,onlyVar]<-value+1
+      
+      value<-matrixList[[matrixVar]]$varMatrix[[i, 1]]
+      if(value>0)
+      {
+        finalMatrix[onlyVar,i]<-value+1
+        finalMatrix[i,onlyVar]<-value+1
+      }
     }
   }
-}
-
-#final case for 2 matrixs
-if(matrixCount==2)
-{
-  for(i in myVars)
+  
+  #final case for 2 matrixs
+  if(matrixCount==2)
   {
-    
-    value<-matrixList[[1]]$varMatrix[[i, 1]]
-    if(value>0)
+    for(i in myVars)
     {
-      for(j in myVars)
+      
+      value<-matrixList[[1]]$varMatrix[[i, 1]]
+      if(value>0)
       {
-        secondValue<-matrixList[[2]]$varMatrix[[j,1]]
-        if(secondValue>0 && i!=j)
+        for(j in myVars)
         {
-          finalMatrix[j,i]<-value+secondValue+1
-          finalMatrix[i,j]<-value+secondValue+1
+          secondValue<-matrixList[[2]]$varMatrix[[j,1]]
+          if(secondValue>0 && i!=j)
+          {
+            finalMatrix[j,i]<-value+secondValue+1
+            finalMatrix[i,j]<-value+secondValue+1
+          }
         }
       }
     }
   }
 }
 
+
+if(length(matrixList)==3)
+{
+  matrixList<-vector("list",3)
+  
+  #counts matrix and stores associated amount of matrixs
+  matrixCount<-0
+  for(i in 1:length(matrixList))
+  {
+    if(sum(matrixList[[i]]$varMatrix>0))
+    {
+      matrixCount<-matrixCount+1
+      matrixList[[matrixCount]]<-i
+    }
+  }
+  
+  if(matrixCount==0)
+  {
+    
+  }
+  
+  if(matrixCount==1)
+  {
+    
+  }
+  
+  if(matrixCount==2)
+  {
+    
+  }
+  
+  if(matrixCount==3)
+  {
+    
+  }
+}
 #matrixList[[3]]<-NULL
 #sum(matrixList[[3]]$varMatrix)
