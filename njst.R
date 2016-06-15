@@ -338,9 +338,18 @@ if(length(matrixList)==3)
     }
   }
   
+  firstVar<-matrixList[[1]]$var
+  secondVar<-matrixList[[2]]$var
+  thirdVar<-matrixList[[3]]$var
+  
   if(matrixCount==0)
   {
-    
+    finalMatrix[firstVar,secondVar]<-1
+    finalMatrix[secondVar,firstVar]<-1
+    finalMatrix[firstVar, thirdVar]<-1
+    finalMatrix[thirdVar,firstVar]<-1
+    finalMatrix[secondVar, thirdVar]<-1
+    finalMatrix[thirdVar, secondVar]<-1
   }
   
   if(matrixCount==1)
