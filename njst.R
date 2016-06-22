@@ -1,12 +1,13 @@
 #3 test cases
 #test<-"(((AID,BED),CAB),(DAD,EGG))"
-test<-"((AN3C:.1,1BED:.2):.15,(CAS2:.1,DE4D:.05):.2)"
+#test<-"((AN3C:.1,B1ED:.2)123:.15,(CAS2:.1,DE4D:.05)125:.2)"
 #test<-"(A,B)"
 #test<-"((A,B),C)"
 #test<-"((A,B),(C,D))"
 #test<-"((ABE,BOG),((COD,DON),EGO))"
 #test<-"((A,B),((C,D),E))"
 #test<-"(((A,B),(C,D)),(E,F))"
+test<-"((A,B),C,D)"
 uniquevarID<-0
 tempVar<-"tempVar"
 
@@ -37,6 +38,36 @@ for (char in test_split)
     count<-count+1 
   }
 }
+
+#used to remove extra numbers from t he original pattern recognizer, may be combined in the future if possible
+count<-1
+numCheck<-FALSE
+for (char in test_split)
+{
+  if(char!="0"&&char!="1"&&char!="2"&&char!="3"&&char!="4"&&char!="5"&&char!="6"&&char!="7"&&char!="8"&&char!="9")
+  {
+    numCheck<-FALSE
+  }
+  if(char==")")
+  {
+    numCheck<-TRUE
+    count<-count+1
+  }
+  
+  if(count>length(test_split))
+  {
+    break
+  }
+  if(numCheck==TRUE&&test_split[count]!=",")
+  {
+    test_split<-test_split[-count]
+  }
+  else
+  {
+    count<-count+1
+  }
+}
+
 
 simplified<-paste(test_split, collapse="")
 
@@ -104,11 +135,9 @@ while(length(matrixList)>2)
   nameStore<-myVars[order(varVal, decreasing=TRUE)]
   count<-0
   
-  #conditional statement for 3 remainin variables with each being the same priority
-  if(length(matrixList)==3&&maxPriority==3)
-  {
-    break
-  }
+  
+
+
   
   #find appropriate indexes to modify
   #TODO: maybe add a conditional statement to make sure numbers are even
@@ -118,6 +147,13 @@ while(length(matrixList)>2)
   {
     indexList[[count+1]]<-match(nameStore[i],myVars)
     count<-count+1
+  }
+  
+  #conditional if statement htat breaks out of a while loop if
+  #matrixList has 3 variables and they all have the same remaining priority
+  if(length(matrixList)==3&&count==3)
+  {
+    break
   }
   
   #handles two variables at a time
@@ -325,7 +361,7 @@ if(length(matrixList)==2)
 
 if(length(matrixList)==3)
 {
-  matrixList<-vector("list",3)
+  matrixIndexes<-vector("list",3)
   
   #counts matrix and stores associated amount of matrixs
   matrixCount<-0
@@ -334,7 +370,7 @@ if(length(matrixList)==3)
     if(sum(matrixList[[i]]$varMatrix>0))
     {
       matrixCount<-matrixCount+1
-      matrixList[[matrixCount]]<-i
+      matrixIndexes[[matrixCount]]<-i
     }
   }
   
