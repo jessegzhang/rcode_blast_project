@@ -390,12 +390,36 @@ if(length(matrixList)==3)
   
   if(matrixCount==1)
   {
-    
+    oneMatrix<-6-matrixIndexes[[1]]
+    if(oneMatrix==5)
+    {
+      
+    }
+    if(oneMatrix==4)
+    {
+      
+    }
+    if(oneMatrix==3)
+    {
+      
+    }
   }
   
   if(matrixCount==2)
   {
-    
+    oneMatrix<-6-matrixIndexes[[1]]-matrixIndexes[[2]]
+    if(oneMatrix==3)
+    {
+      
+    }
+    if(oneMatrix==2)
+    {
+      
+    }
+    if(oneMatrix==1)
+    {
+      
+    }
   }
   
   if(matrixCount==3)
