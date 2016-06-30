@@ -7,7 +7,10 @@
 #test<-"((ABE,BOG),((COD,DON),EGO))"
 #test<-"((A,B),((C,D),E))"
 #test<-"(((A,B),(C,D)),(E,F))"
-test<-"((A,B),C,D)"
+#test<-"((A,B),C,D)"
+#test<-"((A,B),(C,D),E)"
+#test<-"((A,B),(C,D),(E,F))"
+test<-"(((A,B),(C,D)),(E,F),(G,H))"
 uniquevarID<-0
 tempVar<-"tempVar"
 
@@ -44,6 +47,7 @@ count<-1
 numCheck<-FALSE
 for (char in test_split)
 {
+
   if(char!="0"&&char!="1"&&char!="2"&&char!="3"&&char!="4"&&char!="5"&&char!="6"&&char!="7"&&char!="8"&&char!="9")
   {
     numCheck<-FALSE
@@ -51,14 +55,13 @@ for (char in test_split)
   if(char==")")
   {
     numCheck<-TRUE
-    count<-count+1
   }
   
   if(count>length(test_split))
   {
     break
   }
-  if(numCheck==TRUE&&test_split[count]!=",")
+  if(numCheck==TRUE&&test_split[count]!=","&&test_split[count]!=")")
   {
     test_split<-test_split[-count]
   }
@@ -301,6 +304,7 @@ if(length(matrixList)==2)
   {
     matrixCount<-matrixCount+1
     onlyVar<-matrixList[[2]]$var
+    matrixVar<-1
   }
   
   #check second value
@@ -308,6 +312,7 @@ if(length(matrixList)==2)
   {
     matrixCount<-matrixCount+1
     onlyVar<-matrixList[[1]]$var
+    matrixVar<-2
   }
   
   firstVar<-matrixList[[1]]$var
@@ -374,12 +379,14 @@ if(length(matrixList)==3)
     }
   }
   
-  firstVar<-matrixList[[1]]$var
-  secondVar<-matrixList[[2]]$var
-  thirdVar<-matrixList[[3]]$var
-  
+
+  #case for 0 matrix in 3 remaining taxa
   if(matrixCount==0)
   {
+    firstVar<-matrixList[[1]]$var
+    secondVar<-matrixList[[2]]$var
+    thirdVar<-matrixList[[3]]$var
+    
     finalMatrix[firstVar,secondVar]<-1
     finalMatrix[secondVar,firstVar]<-1
     finalMatrix[firstVar, thirdVar]<-1
@@ -388,44 +395,118 @@ if(length(matrixList)==3)
     finalMatrix[thirdVar, secondVar]<-1
   }
   
+  #case for 1 matrix in 3 remaining taxa
   if(matrixCount==1)
   {
     oneMatrix<-6-matrixIndexes[[1]]
+    matrixVar<-matrixIndexes[[1]]
+    #if statement to associate the proper non matrix variables
     if(oneMatrix==5)
     {
-      
+      firstVar<-matrixList[[2]]$var
+      secondVar<-matrixList[[3]]$var
     }
     if(oneMatrix==4)
     {
-      
+      firstVar<-matrixList[[1]]$var
+      secondVar<-matrixList[[3]]$var
     }
     if(oneMatrix==3)
     {
-      
+      firstVar<-matrixList[[1]]$var
+      secondVar<-matrixList[[2]]$var
     }
+    for(i in myVars)
+    {
+      value<-matrixList[[matrixVar]]$varMatrix[[i, 1]]
+      if(value>0)
+      {
+        finalMatrix[firstVar,i]<-value+2
+        finalMatrix[i,firstVar]<-value+2
+        finalMatrix[secondVar,i]<-value+2
+        finalMatrix[i,secondVar]<-value+2
+      }
+    }
+    finalMatrix[firstVar,secondVar]<-2
+    finalMatrix[secondVar,firstVar]<-2
   }
   
+  #Case for 2 matrix in 3 remaining taxa
   if(matrixCount==2)
   {
+
+    #Determines the non matrix by taking note of the indicies 
     oneMatrix<-6-matrixIndexes[[1]]-matrixIndexes[[2]]
-    if(oneMatrix==3)
+    firstVar<-matrixList[[oneMatrix]]$var
+    firstMatrix<-matrixIndexes[[1]]
+    secondMatrix<-matrixIndexes[[2]]
+    #combine two matrix temporarily to calculate distance to the one variable
+    matrixCombined<-matrixList[[firstMatrix]]$varMatrix+matrixList[[secondMatrix]]$varMatrix
+    for(i in myVars)
     {
       
-    }
-    if(oneMatrix==2)
-    {
+      value<-matrixList[[firstMatrix]]$varMatrix[[i, 1]]
+      if(value>0)
+      {
+        for(j in myVars)
+        {
+          secondValue<-matrixList[[secondMatrix]]$varMatrix[[j,1]]
+          if(secondValue>0 && i!=j)
+          {
+            finalMatrix[j,i]<-value+secondValue+2
+            finalMatrix[i,j]<-value+secondValue+2
+          }
+        }
+      }
       
+      value<-matrixCombined[[i,1]]
+      if(value>0)
+      {
+        finalMatrix[i,firstVar]<-value+2
+        finalMatrix[firstVar,i]<-value+2
+      }
     }
-    if(oneMatrix==1)
-    {
-      
-    }
-  }
-  
-  if(matrixCount==3)
-  {
     
   }
+  
+  #Case for 3 matrix in 3 remaining taxa
+  if(matrixCount==3)
+  {
+    #combine two matrix to add for calculation in the third
+    matrixCombined<-matrixList[[1]]$varMatrix+matrixList[[2]]$varMatrix
+    
+    for(i in myVars)
+    {
+      #calculate between two matrix
+      value<-matrixList[[1]]$varMatrix[[i, 1]]
+      if(value>0)
+      {
+        for(j in myVars)
+        {
+          secondValue<-matrixList[[2]]$varMatrix[[j,1]]
+          if(secondValue>0 && i!=j)
+          {
+            finalMatrix[j,i]<-value+secondValue+2
+            finalMatrix[i,j]<-value+secondValue+2
+          }
+        }
+      }
+      
+      #calculate between the last two matrix
+      value<-matrixCombined[[i,1]]
+      if(value>0)
+      {
+        for(j in myVars)
+        {
+          secondValue<-matrixList[[3]]$varMatrix[[j,1]]
+          if(secondValue>0 && i!=j)
+          {
+            finalMatrix[j,i]<-value+secondValue+2
+            finalMatrix[i,j]<-value+secondValue+2
+          }
+        }
+      }
+    }
+  }
 }
-#matrixList[[3]]<-NULL
-#sum(matrixList[[3]]$varMatrix)
+
