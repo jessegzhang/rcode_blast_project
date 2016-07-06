@@ -10,7 +10,9 @@
 #test<-"((A,B),C,D)"
 #test<-"((A,B),(C,D),E)"
 #test<-"((A,B),(C,D),(E,F))"
-test<-"(((A,B),(C,D)),(E,F),(G,H))"
+#test<-"(((A,B),(C,D)),(E,F),(G,H))"
+#test<-"(A,(D,C))"
+test<-"((H_1,C),(H_2,G))"
 uniquevarID<-0
 tempVar<-"tempVar"
 
@@ -89,6 +91,7 @@ for (vars in myVars)
 
 #splits the newick notation into variables
 full_split<-gsub("[A-Z0-9]"," ",simplified)
+full_split<-gsub("_"," ",full_split)
 full_split<-gsub("(?<=[\\s])\\s*|^\\s+|\\s+$", "", full_split, perl=TRUE)
 full_split <- strsplit(full_split, "")[[1]]
 
@@ -122,11 +125,7 @@ rownames(finalMatrix)<-myVars
 while(length(matrixList)>2)
 {
   #begin implementing calculation
-  #TODO: find a way to find pairs of variables
-  #3 cases
-  #2 variables with empty matricies = 1 variable with a matricie
-  #1 variable with empty 1 varibale with filled matrix = 1 variable 
-  # 2 variables with filled matrix
+
   
   
   #finding highest priority and amount
@@ -137,11 +136,7 @@ while(length(matrixList)>2)
   #ordering names in order
   nameStore<-myVars[order(varVal, decreasing=TRUE)]
   count<-0
-  
-  
 
-
-  
   #find appropriate indexes to modify
   #TODO: maybe add a conditional statement to make sure numbers are even
   #list preallocated to be more efficient
@@ -152,7 +147,7 @@ while(length(matrixList)>2)
     count<-count+1
   }
   
-  #conditional if statement htat breaks out of a while loop if
+  #conditional if statement that breaks out of a while loop if
   #matrixList has 3 variables and they all have the same remaining priority
   if(length(matrixList)==3&&count==3)
   {
@@ -258,7 +253,7 @@ while(length(matrixList)>2)
         
         value<-matrixList[[indexList[[i]]]]$varMatrix[[ii, 1]]
         if(value>0)
-        {
+        { 
           for(jj in myVars)
           {
             secondValue<-matrixList[[indexList[[i+1]]]]$varMatrix[[jj, 1]]
