@@ -13,9 +13,9 @@ if(trueFalse[[2]]=="TRUE")
 oneLine <- readLines(con, n=1, warn = FALSE)
 print(oneLine)
 
-#while (length(oneLine <- readLines(con, n = 1, warn = FALSE)) > 0)
-#{
-#  print(oneLine)
-#} 
+while (length(oneLine <- readLines(con, n = 1, warn = FALSE)) > 0 && oneLine!="//")
+{
+  print(oneLine)
+} 
 
 close(con)
