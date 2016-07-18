@@ -31,7 +31,7 @@ simplifyNewick<-function(newickString)
     }
   }
   
-  #used to remove extra numbers from t he original pattern recognizer, may be combined in the future if possible
+  #used to remove extra numbers from the original pattern recognizer, may be combined in the future if possible
   count<-1
   numCheck<-FALSE
   for (char in split)
@@ -81,7 +81,7 @@ establishPriority<-function(simpleStr,varList)
   }
   
   #splits the newick notation into characters and also reduces vars into a single whitespace
-  full_split<-gsub("[A-Z0-9]"," ",simpleStr)
+  full_split<-gsub("[A-Z0-9a-z]"," ",simpleStr)
   full_split<-gsub("_"," ",full_split)
   full_split<-gsub("(?<=[\\s])\\s*|^\\s+|\\s+$", "", full_split, perl=TRUE)
   full_split <- strsplit(full_split, "")[[1]]
