@@ -1,5 +1,5 @@
 #needs to be changed appropriately
-setwd("D:/GitHub/rcode_blast_project")
+setwd("~/GitHub/rcode_blast_project")
 source("njst.R")
 
 con  <- file(file.choose(), open = "r")
@@ -118,7 +118,24 @@ for(i in 1:keyLength)
   cat("\n\n")
 }
 
+matrixReductionList<-vector(mode="list", length=DMLength)
+#establish list for reduction
+for(i in 1:DMLength)
+{
+  matrixVarKey<-vector(mode="list", length=keyLength)
+  tempMatrix=matrix(0, nrow=1, ncol=nrow(distanceMatrixList[[i]]))
+  for(j in 1:keyLength)
+  {
+    matrixVarKey[[j]]<-list(key=keyList[[j]]$key, associatedMatrix=tempMatrix)
+  }
+  matrixReductionList[[i]]<-list(matrix=distanceMatrixList[[i]], matrixKeyList=matrixVarKey)
+}
 
+#calculation of the matrix here
+for(i in matrixReductionList)
+{
+  print(i$matrix)
+}
 
 #add associated print menu here
 close(con)
