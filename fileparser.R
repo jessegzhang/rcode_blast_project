@@ -1,5 +1,5 @@
 #needs to be changed appropriately
-setwd("~/GitHub/rcode_blast_project")
+setwd("D:/GitHub/rcode_blast_project")
 source("njst.R")
 
 con  <- file(file.choose(), open = "r")
@@ -102,6 +102,19 @@ if(alternateName==FALSE)
   }
 }
 
+#reduction of keyList
+tempKeyList<-vector(mode="list",length=keyLength)
+for(i in 1:keyLength)
+{
+  tempVarListKey<-vector(mode="list", length=keyList[[i]]$length)
+  for(j in 1:keyList[[i]]$length)
+  {
+    tempVarListKey[[j]]<-keyList[[i]]$varList[[j]]
+  }
+  tempKeyList[[i]]<-list(key=keyList[[i]]$key, varList=tempVarListKey)
+}
+keyList<-tempKeyList
+
 #print out for user confirmation
 #whether or not they like that list
 
@@ -110,9 +123,9 @@ for(i in 1:keyLength)
   cat("Key: ")
   cat(keyList[[i]]$key)
   cat("\nAssociated Variables: ")
-  for(j in 1:keyList[[i]]$length)
+  for(j in keyList[[i]]$varList)
   {
-    cat(keyList[[i]]$varList[[j]])
+    cat(j)
     cat(" ")
   }
   cat("\n\n")
@@ -131,10 +144,28 @@ for(i in 1:DMLength)
   matrixReductionList[[i]]<-list(matrix=distanceMatrixList[[i]], matrixKeyList=matrixVarKey)
 }
 
+
+
 #calculation of the matrix here
-for(i in matrixReductionList)
+for(i in 1:length(matrixReductionList))
 {
-  print(i$matrix)
+  matrixCount<-1
+  for(j in colnames(matrixReductionList[[i]]$matrix))
+  {
+    taxaList <- sapply(keyList,"[[","varList")
+    keyCount<-1
+    for(k in taxaList)
+    {
+      keyMatch<-match(j, k)
+      if(!is.na(keyMatch))
+      {
+        break
+      }
+      keyCount<-keyCount+1
+    }
+    matrixReductionList[[i]]$matrixKeyList[[keyCount]]$associatedMatrix[1,matrixCount]<-1
+    matrixCount<-matrixCount+1
+  }
 }
 
 #add associated print menu here
