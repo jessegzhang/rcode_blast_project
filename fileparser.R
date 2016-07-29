@@ -1,5 +1,6 @@
 #needs to be changed appropriately
-setwd("D:/GitHub/rcode_blast_project")
+setwd("C:/Users/jgzhang/Documents/Github/rcode_blast_project")
+#setwd("D:/GitHub/rcode_blast_project")
 source("njst.R")
 
 con  <- file(file.choose(), open = "r")
@@ -122,7 +123,7 @@ for(i in 1:keyLength)
 {
   cat("Key: ")
   cat(keyList[[i]]$key)
-  cat("\nAssociated Variables: ")
+  cat("\nAssociated Taxa: ")
   for(j in keyList[[i]]$varList)
   {
     cat(j)
@@ -168,5 +169,31 @@ for(i in 1:length(matrixReductionList))
   }
 }
 
-#add associated print menu here
+#creates final phylogenetic matrix
+phyloMatrix <- matrix(0,nrow=length(keyList),ncol=length(keyList))
+colnames(phyloMatrix)<-sapply(keyList,"[[","key")
+rownames(phyloMatrix)<-sapply(keyList,"[[","key")
+for(i in seq.int(1,length(keyList)-1,1))
+{
+  for(j in seq.int(i+1,length(keyList),1))
+  {
+    entryTotal<-0
+    for(k in matrixReductionList)
+    {
+      #calculates entryCount and entrySum
+      entryCount<-sum(k$matrixKeyList[[i]]$associatedMatrix)*sum(k$matrixKeyList[[j]]$associatedMatrix)
+      entrySum<-sum(k$matrixKeyList[[i]]$associatedMatrix%*%k$matrix%*%t(k$matrixKeyList[[j]]$associatedMatrix))
+      if(entrySum==0)
+      {
+        stop("Matrix does not contain all species, exiting...")
+      }
+      entryTotal<-entryTotal+(entrySum/entryCount)
+    }
+    #enter the entries in the phylogenetic matrix with the average of the averages
+    phyloMatrix[keyList[[i]]$key,keyList[[j]]$key]<-(entryTotal/length(matrixReductionList))
+    phyloMatrix[keyList[[j]]$key,keyList[[i]]$key]<-(entryTotal/length(matrixReductionList))
+  }
+}
+
+
 close(con)
