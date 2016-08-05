@@ -1,7 +1,12 @@
 \documentclass{article}
 \usepackage{graphicx}
 \usepackage{setspace}
+\usepackage{amsmath}
+\usepackage{kbordermatrix}
+\usepackage{graphicx}
+\graphicspath{{latex_pictures/}}
 \doublespacing
+
 \begin{document}
 
 \title{}
@@ -21,6 +26,73 @@ your will be able to write a paper using LaTeX.
 
 The purpose of the parser is to take a phylogenetic tree via variations of Newick notation, and create a distance matrix based on the taxa given via the Unrooted STAR method(U-STAR). The parser was written in R. 
 
+\section{Concept}
+Given the Newick notation $(((A,B),C),(D,E))$ we wish to obtain the distance matrix: \[
+ \kbordermatrix{
+	& A & B & C & D & E \\
+	A & 0 & 2 & 3 & 4 & 4 \\
+	B & 2 & 0 & 3 & 4 & 4 \\
+	C & 3 & 3 & 0 & 3 & 3 \\
+	D & 4 & 4 & 3 & 0 & 2 \\
+	E & 4 & 4 & 3 & 2 & 0
+}
+\]
+
+In order to achieve this we determine which taxon to resolve first and form named nodes to help condense the Newick notation until we have two or three remaining taxa/node names. Visualizing the following Newick notation via a distance tree gives the following, with each branch having a length of one. \newline
+\includegraphics{firstTree.PNG}
+
+Based on the given Newick notation we wish to resolve the innermost taxon first, this is done by finding priority, which produces a table such as the one seen below.
+
+\begin{center}
+	\begin{tabular}{ |c|c| } 
+		\hline
+		Taxon/Node Name & Priority  \\
+		\hline
+		 A & 3 \\ 
+		 \hline
+		 B & 3 \\ 
+		 \hline
+		 C & 2 \\
+		 \hline 
+		 D & 2 \\
+		 \hline 
+		 E & 2 \\ 
+		\hline
+	\end{tabular}
+\end{center}
+
+As soon in fig 3 we wish to resolve taxon A and B first, the resultant will be the creation of a named node with a distance vector from the taxa. This will reduce the tree removing A and B and instead replace both with a named node as seen below. \newline
+
+\includegraphics{secondTree.PNG} 
+
+We also lower the named nodes priority by 1, it will also have the associated distance vector:
+\[
+\kbordermatrix{
+	& \\
+	A & 1 \\
+	B & 1 \\
+	C & 0 \\
+	D & 0 \\
+	E & 0
+}
+\]
+
+The priorities 
+\begin{center}
+	\begin{tabular}{ |c|c| } 
+		\hline
+		Taxon/Node Name & Priority  \\
+		\hline
+		tempVar0 & 2 \\ 
+		\hline
+		C & 2 \\
+		\hline 
+		D & 2 \\
+		\hline 
+		E & 2 \\ 
+		\hline
+	\end{tabular}
+\end{center}
 \section{Methodology}
  
 \subsection{Setup Phase:}
@@ -37,11 +109,8 @@ After initialization of the {\tt matrixList} we will then determine priority for
 
 The final distance matrix is initialized at this point as a $X$ by $X$ matrix. We will then set the column names and row names to the associated taxa names store in {\tt myVars}. 
 
+\subsection{Algorithm}
 
-\subsection{Algorithm Concept}
-
-
-\subsection{Algorithm Implementation}
 Setting priority is important as we wish to compute the innermost taxa first For example in $((A,B),C)$. We would need to resolve A and B in a distance matrix before finally resolving it with taxa C. The program is set to be in a while loop to continue while the length of the matrixList is greater than two. In the while loop we will sort the variables by its priority and then make note of the highest priority variables in an indexList, which is preallocated with a default size of 100.
 
 Within the while loop after properly indexing the highest priority of matrixList we enter a for loop that resolves two indexes of matrixList at a time. Within the algorithm there exists two classifications of indexes of matrixList, an index with a distance matrix and an index with an empty matrix. This leads to three cases after looking at both variables, if there are only two taxas then the finalMatrix will enter the values of having a distance two apart, it will then delete both entries and replace it with a temporary variable, and populate a distance matrix with a distance of one from each of the two original taxa. The R code is setup to generate any temporary variable to start with tempvar0, temvar1, etc… The value of this is then reduced by one thus lowering its priority. 

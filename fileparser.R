@@ -1,6 +1,6 @@
 #needs to be changed appropriately
-setwd("C:/Users/jgzhang/Documents/Github/rcode_blast_project")
-#setwd("D:/GitHub/rcode_blast_project")
+#setwd("C:/Users/jgzhang/Documents/Github/rcode_blast_project")
+setwd("D:/GitHub/rcode_blast_project")
 source("njst.R")
 
 con  <- file(file.choose(), open = "r")
