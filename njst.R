@@ -138,7 +138,7 @@ distanceMatrix<-function(matrixList, varList, finalMatrix)
     #find appropriate indexes to modify
     #TODO: maybe add a conditional statement to make sure numbers are even
     #list preallocated to be more efficient
-    indexList<-vector("list",100)
+    indexList<-vector("list",length(matrixList))
     for(i in 1:sum(varVal==maxPriority))
     {
       indexList[[count+1]]<-match(nameStore[i],varList)
@@ -389,12 +389,12 @@ threeVars<-function(matrixList,varList,finalMatrix)
     secondVar<-matrixList[[2]]$var
     thirdVar<-matrixList[[3]]$var
     
-    finalMatrix[firstVar,secondVar]<-1
-    finalMatrix[secondVar,firstVar]<-1
-    finalMatrix[firstVar, thirdVar]<-1
-    finalMatrix[thirdVar,firstVar]<-1
-    finalMatrix[secondVar, thirdVar]<-1
-    finalMatrix[thirdVar, secondVar]<-1
+    finalMatrix[firstVar,secondVar]<-2
+    finalMatrix[secondVar,firstVar]<-2
+    finalMatrix[firstVar, thirdVar]<-2
+    finalMatrix[thirdVar,firstVar]<-2
+    finalMatrix[secondVar, thirdVar]<-2
+    finalMatrix[thirdVar, secondVar]<-2
   }
   
   #case for 1 matrix in 3 remaining taxa
@@ -491,11 +491,17 @@ threeVars<-function(matrixList,varList,finalMatrix)
             finalMatrix[j,i]<-value+secondValue+2
             finalMatrix[i,j]<-value+secondValue+2
           }
+          thirdValue<-matrixList[[3]]$varMatrix[[j,1]]
+          if(thirdValue>0&&i!=j)
+          {
+            finalMatrix[j,i]<-value+thirdValue+2
+            finalMatrix[i,j]<-value+thirdValue+2
+          }
         }
       }
       
       #calculate between the last two matrix
-      value<-matrixCombined[[i,1]]
+      value<-matrixList[[2]]$varMatrix[[i, 1]]
       if(value>0)
       {
         for(j in varList)
