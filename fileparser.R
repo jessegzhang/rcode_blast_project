@@ -1,6 +1,7 @@
 fileParser<-function(con)
 {
-  #perhaps check for empty file?
+
+  #TODO: add check for empty file
   
   alternateName=FALSE
   
@@ -192,7 +193,7 @@ fileParser<-function(con)
   
   return(phyloMatrix)
 }
-#needs to be changed appropriately
+#sets working directory for the other file
 #setwd("C:/Users/jgzhang/Documents/Github/rcode_blast_project")
 setwd("D:/GitHub/rcode_blast_project")
 source("njst.R")
