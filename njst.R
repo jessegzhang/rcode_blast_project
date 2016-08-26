@@ -65,7 +65,7 @@ simplifyNewick<-function(newickString)
 
 #establishPriority
 #Function that takes a string and varList and establishes
-#A matrix with a matrix and a set priorities of which taxa
+#A matrix and set priorities of which taxa
 #to resolve first
 #returns a matrixList populated with the proper values
 establishPriority<-function(simpleStr,varList)
@@ -136,7 +136,6 @@ distanceMatrix<-function(matrixList, varList, finalMatrix)
     count<-0
     
     #find appropriate indexes to modify
-    #TODO: maybe add a conditional statement to make sure numbers are even
     #list preallocated to be more efficient
     indexList<-vector("list",length(matrixList))
     for(i in 1:sum(varVal==maxPriority))
@@ -316,14 +315,14 @@ twoVars<-function(matrixList,varList,finalMatrix)
   firstVar<-matrixList[[1]]$var
   secondVar<-matrixList[[2]]$var
   
-  #final case for 2 variable
+  #final case for 2 taxa
   if(matrixCount==0)
   {
     finalMatrix[firstVar,secondVar]<-1
     finalMatrix[secondVar,firstVar]<-1
   }
   
-  #final case for 1 variable and 1 matrix
+  #final case for 1 taxon and 1 node name
   if(matrixCount==1)
   {
     for(i in varList)
@@ -338,7 +337,7 @@ twoVars<-function(matrixList,varList,finalMatrix)
     }
   }
   
-  #final case for 2 matrixs
+  #final case for 2 node names
   if(matrixCount==2)
   {
     for(i in varList)
@@ -382,7 +381,7 @@ threeVars<-function(matrixList,varList,finalMatrix)
   }
   
   
-  #case for 0 matrix in 3 remaining taxa
+  #case for 0 node names in 3 remaining taxa
   if(matrixCount==0)
   {
     firstVar<-matrixList[[1]]$var
@@ -397,7 +396,7 @@ threeVars<-function(matrixList,varList,finalMatrix)
     finalMatrix[thirdVar, secondVar]<-2
   }
   
-  #case for 1 matrix in 3 remaining taxa
+  #case for 1 node name and 2 remaining taxa
   if(matrixCount==1)
   {
     oneMatrix<-6-matrixIndexes[[1]]
@@ -433,7 +432,7 @@ threeVars<-function(matrixList,varList,finalMatrix)
     finalMatrix[secondVar,firstVar]<-2
   }
   
-  #Case for 2 matrix in 3 remaining taxa
+  #Case for 2 node name and 1 remaining taxa
   if(matrixCount==2)
   {
     
@@ -442,7 +441,7 @@ threeVars<-function(matrixList,varList,finalMatrix)
     firstVar<-matrixList[[oneMatrix]]$var
     firstMatrix<-matrixIndexes[[1]]
     secondMatrix<-matrixIndexes[[2]]
-    #combine two matrix temporarily to calculate distance to the one variable
+    #combine two node names temporarily to calculate distance to the one variable
     matrixCombined<-matrixList[[firstMatrix]]$varMatrix+matrixList[[secondMatrix]]$varMatrix
     for(i in varList)
     {
@@ -471,7 +470,7 @@ threeVars<-function(matrixList,varList,finalMatrix)
     
   }
   
-  #Case for 3 matrix in 3 remaining taxa
+  #Case for 3 node names and 0 remaining taxa
   if(matrixCount==3)
   {
     #combine two matrix to add for calculation in the third
@@ -479,7 +478,7 @@ threeVars<-function(matrixList,varList,finalMatrix)
     
     for(i in varList)
     {
-      #calculate between two matrix
+      #calculate between node names
       value<-matrixList[[1]]$varMatrix[[i, 1]]
       if(value>0)
       {
@@ -500,7 +499,7 @@ threeVars<-function(matrixList,varList,finalMatrix)
         }
       }
       
-      #calculate between the last two matrix
+      #calculate between the last two node names
       value<-matrixList[[2]]$varMatrix[[i, 1]]
       if(value>0)
       {

@@ -44,8 +44,8 @@ We populate the {\tt phyloMatrix} by examining all combinations of two species i
 
 \section{Concept}
 
-Given the Newick notation $(((A,B),C),(D,E))$ we wish to obtain the distance matrix:
-\begin{figure}[!ht]
+Given the Newick notation $(((A,B),C),(D,E))$ we wish to obtain the distance matrix shown in Figure \ref{fig:dtab}.
+\begin{figure}[h]
  \[
  \kbordermatrix{
 	& A & B & C & D & E \\
@@ -56,17 +56,17 @@ Given the Newick notation $(((A,B),C),(D,E))$ we wish to obtain the distance mat
 	E & 4 & 4 & 3 & 2 & 0
 }
 \]
-\caption{Distance matrix given the following Newick notation}
+\caption{Distance matrix given the following Newick notation}\label{fig:dtab}
 \end{figure}
 
-In order to achieve this we determine which taxon to resolve first and form named nodes to help condense the Newick notation until we have two or three remaining taxa/node names. Visualizing the following Newick notation via a distance tree gives the following, with each branch having a length of one. \newline
-\begin{figure}[!ht]
+In order to achieve this we determine which taxon to resolve first and form named nodes to help condense the Newick notation until we have two or three remaining taxa/node names. Visualizing the following Newick notation via a distance tree gives Figure \ref{fig:tree}, with each branch having a length of one.
+\begin{figure}[h]
 \includegraphics{firstTree.PNG}
-\caption{Visualization of Newick notation as an unrooted tree}
+\caption{Visualization of Newick notation as an unrooted tree}\label{fig:tree}
 \end{figure}
 Based on the given Newick notation we wish to resolve the innermost taxon first, this is done by finding priority, which produces a table such as the one seen below.
 
-\begin{figure}[!ht]
+\begin{figure}
 	\begin{center}
 	\begin{tabular}{ |c|c| } 
 		\hline
@@ -89,7 +89,7 @@ Based on the given Newick notation we wish to resolve the innermost taxon first,
 \end{figure}
 As soon in \textit{fig. 3} we wish to resolve taxon A and B first, the resultant will be the creation of a named node with a distance vector from the taxa. This will reduce the tree removing A and B and instead replace both with a named node called tempVar0 as seen below. \newline
 
-\begin{figure}[!ht]
+\begin{figure}
 
 \includegraphics{secondTree.PNG} 
 \caption{unrooted tree after two taxa have been condensed into a node name}
@@ -97,7 +97,7 @@ As soon in \textit{fig. 3} we wish to resolve taxon A and B first, the resultant
 
 Every node name has a distance vector associated with it, listing the distance away it is from relevant taxa, below is an example of that distance vector. 
 
-\begin{figure}[!ht]
+\begin{figure}
 \[
 \kbordermatrix{
 	& \\
@@ -113,7 +113,7 @@ Every node name has a distance vector associated with it, listing the distance a
 
 Any new node name will take upon the previous two taxa priority but have it reduced by one, this produces an updated priority table like so.
 
-\begin{figure}[!ht]
+\begin{figure}
 \begin{center}
 	\begin{tabular}{ |c|c| } 
 		\hline
@@ -162,6 +162,9 @@ In the case of one taxon one node name, the program will pass through the node n
 
 \subsubsection{Case 3: two node name}
 In the case of two node names the program passes through the first node name and for each non-zero value it will pass through the second node name for non-zero values. For each non-zero value in the second node name we will fill the {\tt finalMatrix} entry with the two non-zero values added together plus two. These two node names will then be deleted and replaced with a new node name taking on the previous priority subtracted by one. The distance vector of the new node name will have the two previous node name distance vectors added together. It will then increment any non-zero value in the distance vector by one. 
+
+\bigskip
+
 
 The program will continue passing through the {\tt matrixList} until its length is either three, with all three indexes having the same priority or if the length of the {\tt matrixList} is two. If there are only two remaining indexes a similar process is done as the above cases for populating values in the {\tt finalMatrix}, however rather then having the value plus two it is simply the value plus one. This is because there is no longer an additional branch to factor in due to it being the final two taxa/node names. 
 However, in the case of the {\tt matrixList} having a length of three with each index having the same priority we have four unique cases, three taxa, two taxa and one node name, one taxa and two node names, and three node names. 
