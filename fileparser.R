@@ -30,15 +30,15 @@ fileParser<-function(con)
     if(alternateName==TRUE)
     {
       tempVarGrab<-simplifyNewick(oneLine)
-      
+
       #grab matrixVars for the incoming for loop
       matrixVars<-strsplit((gsub("[()]","",tempVarGrab)),"[,]")[[1]]
-      
+
       #remove each var into whitespace to be replaced by simplified var
       removeAltNamingScheme<-gsub("[A-Z0-9a-z]"," ",tempVarGrab)
       removeAltNamingScheme<-gsub("_"," ",removeAltNamingScheme)
       removeAltNamingScheme<-gsub("(?<=[\\s])\\s*|^\\s+|\\s+$", "", removeAltNamingScheme, perl=TRUE)
-      
+
       #iterates through each variable, looks at the value before the underscore and sees
       #if the entry is in keyList if not, generates an entry
       for(i in matrixVars)
@@ -57,18 +57,19 @@ fileParser<-function(con)
         if(is.na(keyMatch))
         {
           varListKey<-vector(mode="list", length=100)
-          varListKey[[1]]<-keySplit[[2]]
+          varListKey[[1]]<-paste(keySplit[[2]],keySplit[[1]],sep="")
           keyList[[keyLength+1]]<-list(key=keySplit[[1]], varList=varListKey, length=1)
           keyLength<-keyLength+1
           #else we will be using the keyMatch index value and adding it to the varList for the key
           #and incrementing its length by 1
         } else {
           listLength<-keyList[[keyMatch]]$length
-          keyList[[keyMatch]]$varList[[listLength+1]]<-keySplit[[2]]
+          keyList[[keyMatch]]$varList[[listLength+1]]<-paste(keySplit[[2]],keySplit[[1]],sep="")
           keyList[[keyMatch]]$length<-listLength+1
         }
         #replace a whitespace with a variable
-        removeAltNamingScheme<-sub(" ",keySplit[[2]],removeAltNamingScheme)
+        removeAltNamingScheme<-sub(" ",paste(keySplit[[2]],keySplit[[1]],sep=""),removeAltNamingScheme)
+        print(removeAltNamingScheme)
       }
       #generates distance matrixes and input them into the distanceMatrixLIst
       distanceMatrixList[[DMLength+1]]<-grabDistanceMatrix(removeAltNamingScheme)
@@ -77,11 +78,12 @@ fileParser<-function(con)
     #if not using alternate naming scheme we generate distance matrixes normally
     else 
     {
-      distanceMatrixList[[DMLength+1]]<-grabDistanceMatrix(oneLine)
+      tempVarGrab<-simplifyNewick(oneLine)
+      distanceMatrixList[[DMLength+1]]<-grabDistanceMatrix(tempVarGrab)
       DMLength<-DMLength+1
     }
   } 
-  
+
   #at the end if the alternate name scheme is not being used we will have to make a new keyList based on
   #supplied data
   #e.g. H: AID, BED
@@ -143,6 +145,7 @@ fileParser<-function(con)
   
   
   #calculation of the matrix here
+  #takes matrixReductionList and give it the associated entries denoted with 1
   for(i in 1:length(matrixReductionList))
   {
     matrixCount<-1
@@ -164,10 +167,13 @@ fileParser<-function(con)
     }
   }
   
+  
+  
   #creates final phylogenetic matrix
   phyloMatrix <- matrix(0,nrow=length(keyList),ncol=length(keyList))
   colnames(phyloMatrix)<-sapply(keyList,"[[","key")
   rownames(phyloMatrix)<-sapply(keyList,"[[","key")
+  #triple nested for loop
   for(i in seq.int(1,length(keyList)-1,1))
   {
     for(j in seq.int(i+1,length(keyList),1))
@@ -176,30 +182,39 @@ fileParser<-function(con)
       for(k in matrixReductionList)
       {
         #calculates entryCount and entrySum
+        #takes first index and second index of the first two matrix in keylist and multiplies them
         entryCount<-sum(k$matrixKeyList[[i]]$associatedMatrix)*sum(k$matrixKeyList[[j]]$associatedMatrix)
+        #t denotes the transpose of a matrix
         entrySum<-sum(k$matrixKeyList[[i]]$associatedMatrix%*%k$matrix%*%t(k$matrixKeyList[[j]]$associatedMatrix))
+        
         if(entrySum==0)
         {
           stop("Matrix does not contain all species, exiting...")
         }
         entryTotal<-entryTotal+(entrySum/entryCount)
+        #sums everything
       }
       #enter the entries in the phylogenetic matrix with the average of the averages
+      #takes the average via length(matrixReductionlist)
       phyloMatrix[keyList[[i]]$key,keyList[[j]]$key]<-(entryTotal/length(matrixReductionList))
       phyloMatrix[keyList[[j]]$key,keyList[[i]]$key]<-(entryTotal/length(matrixReductionList))
     }
   }
-  
-  
+  print(phyloMatrix)
   return(phyloMatrix)
 }
 #sets working directory for the other file
 #setwd("C:/Users/jgzhang/Documents/Github/rcode_blast_project")
 setwd("D:/GitHub/rcode_blast_project")
 source("njst.R")
+start.time <- Sys.time()
 
 con  <- file(file.choose(), open = "r")
 
 fileParser(con)
 
 close(con)
+
+end.time <- Sys.time()
+
+time.taken <- end.time - start.time

@@ -524,14 +524,12 @@ threeVars<-function(matrixList,varList,finalMatrix)
 grabDistanceMatrix<-function(newickString)
 {
   #invokes a function that sheds unecessary newick notation
-  simplified<-simplifyNewick(newickString)
+  simplified<-newickString
   
   #splits variables in simplified into a character array
   myVars<-strsplit((gsub("[()]","",simplified)),"[,]")[[1]]
-  
   #initalizing list to store variables and establishes priority
   matrixList<-establishPriority(simplified,myVars)
-  
   #creates distance matrix to be returned at the end of function 
   finalMatrix <- matrix(0,nrow=length(myVars),ncol=length(myVars))
   #names(varList) might be able to be subsitute by myVars 

@@ -1,5 +1,5 @@
 USE_ALTERNATE_NAMING_SCHEME=TRUE
 //
-(((Ha_AID,Ha_BED),As_CAB),(Af_DAD,Af_EGG))
-((As_ABE,As_BOG),((Ha_COD,Af_DON),As_EGO))
+(((dog_dog1,dog_dog2),cat_cat1),rat_rat1)
+(((dog_dog1,cat_cat1),cat_cat2),rat_rat1)
 //
